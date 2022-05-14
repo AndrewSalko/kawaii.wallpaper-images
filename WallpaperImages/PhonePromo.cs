@@ -155,15 +155,19 @@ namespace WallpaperImages
 			{				
 				"iPhone 6 Plus",
 				"iPhone 7 Plus",
-				"Magic THL W8",
-				"Magic THL W9",
-				"Magic THL W300",
-				"Lenovo K900",
-				"Sony Xperia Z",
-				"Samsung Galaxy S4",
-				"LG D802 Optimus G2",
-				"HTC One",
-				"Samsung Galaxy Note 3"
+				"Samsung Galaxy Note 3",
+				"Xiaomi Mi Note 2",
+				"Xiaomi Redmi Note 4"
+
+				//эти модели уже устарели, и ценности на сайте не имеют
+				//"Magic THL W8",
+				//"Magic THL W9",
+				//"Magic THL W300",
+				//"Lenovo K900",
+				//"Sony Xperia Z",
+				//"Samsung Galaxy S4",
+				//"LG D802 Optimus G2",
+				//"HTC One",
 			};
 			_ScreenToPhones["1080x1920"] = phones1080x1920;
 			#endregion
