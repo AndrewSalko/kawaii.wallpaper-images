@@ -172,6 +172,11 @@ namespace WallpaperImages
 			_ScreenToPhones["1080x1920"] = phones1080x1920;
 			#endregion
 
+			//1284x2778     iPhone 12 Pro Max
+			//1125x2436     iPhone X
+			//1080x2340     iPhone 12 Mini, Xiaomi Redmi 9
+			//
+
 		}
 
 		public string GetPhonePromoText(Size phoneScreenSize)

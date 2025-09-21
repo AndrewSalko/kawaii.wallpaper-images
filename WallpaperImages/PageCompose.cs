@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Windows.Forms;
 
@@ -28,11 +29,51 @@ namespace WallpaperImages
 
 		string _AnimeName;
 
+		Dictionary<string, string> _GenreLinks = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
 		public PageCompose(string animeName)
 		{
 			_AnimeName = animeName;
 			_LoadTemplates();
+			_LoadGenres();
 		}
+
+		void _LoadGenres()
+		{
+			var assm = Assembly.GetExecutingAssembly();
+
+			var genresHtmls = _ReadResource(assm, "WallpaperImages.Genres.txt");
+			var lines = genresHtmls.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+			foreach (var ln in lines)
+			{
+				var prep = ln.TrimEnd().Replace("</a>", string.Empty);
+				var subInd = prep.IndexOf(">");
+
+				var linkName = prep.Substring(subInd + 1, prep.Length - subInd - 1);
+
+				_GenreLinks[linkName] = ln;
+
+			}//foreach
+
+			//_GenresLinks.AddRange(lines);
+		}
+
+		public string _ReadResource(Assembly assm, string resourceFileName)
+		{
+			using (var stream = assm.GetManifestResourceStream(resourceFileName))
+			{
+				if (stream == null)
+					throw new KeyNotFoundException($"GetManifestResourceStream: resource {resourceFileName} not found");
+
+				using (var reader = new StreamReader(stream))
+				{
+					return reader.ReadToEnd();
+				}
+			}
+		}
+
+
 
 		void _LoadTemplates()
 		{
@@ -159,11 +200,21 @@ namespace WallpaperImages
 				string head = string.Format(heads[indexHead].Template, _AnimeName);
 				string body = string.Format(bodies[indexBody].Template, _AnimeName);
 
-				result += head;
-				result += Environment.NewLine;
+				//result += head;
+				//result += Environment.NewLine;
 				
 				bodiesHTML.Add(body);
 			}
+
+			if (!string.IsNullOrWhiteSpace(genreText))
+			{
+				var genreHtml = _GetGenreHtml(genreText); //"<p>Genre: " + genreText + "</p>";
+				if (!string.IsNullOrEmpty(genreHtml))
+				{
+					result += genreHtml;
+					result += Environment.NewLine;
+				}
+			}			
 
 			if (useHTMLTableFormat)
 			{
@@ -207,12 +258,6 @@ namespace WallpaperImages
 				result += "</table>" + Environment.NewLine;				
 			}
 
-			if (!string.IsNullOrWhiteSpace(genreText))
-			{
-				result += "<p>Genre: " + genreText + "</p>";
-			}
-			result += Environment.NewLine;
-
 			if (!string.IsNullOrWhiteSpace(wikiLink))
 			{
 				string linkTemplate = "<a href=\"{0}\" rel=\"nofollow\" target=\"_blank\">{1} on Wikipedia</a>";
@@ -221,5 +266,33 @@ namespace WallpaperImages
 
 			return result;
 		}
+
+		string _GetGenreHtml(string genres)
+		{
+			//разделим по запятой
+			var parts = genres.Split(',');
+
+			StringBuilder result = new StringBuilder();
+
+			foreach (var item in parts)
+			{
+				var ln = item.Trim().Replace("[1]", string.Empty);
+				if (!string.IsNullOrEmpty(ln)) 
+				{
+					if(_GenreLinks.TryGetValue(ln, out var link))
+					{
+						if(result.Length > 0)
+						{
+							result.Append(",");
+						}
+
+						result.Append(link);
+					}
+				}
+			}
+
+			return result.ToString();
+		}
+
 	}
 }
